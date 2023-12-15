@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Product from "../components/Product";
 import Message from "../components/Message";
 import ProductCarousel from "../components/ProductCarousel";
+import SearchBox from "../components/SearchBox";
 
 const HomeScreen = () => {
   const { pageNumber, keyword } = useParams();
@@ -16,6 +17,7 @@ const HomeScreen = () => {
 
   return (
     <>
+      <SearchBox />
       {!keyword ? (
         <ProductCarousel />
       ) : (
