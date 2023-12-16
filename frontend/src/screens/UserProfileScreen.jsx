@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Form, Button, Row, Col, Alert, Modal } from "react-bootstrap";
+import { Form, Button, Row, Col, Alert, Modal, Card } from "react-bootstrap";
 import {
   useGetUserDetailsQuery,
   useProfileMutation,
 } from "../slices/usersApiSlice";
+import { FaUserEdit } from "react-icons/fa";
 
 const UserProfileScreen = () => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -76,21 +77,39 @@ const UserProfileScreen = () => {
   }
 
   return (
-    <Row>
-      <Col md={9}>
-        <h2>User Profile</h2>
-        {message && <Alert variant="danger">{message}</Alert>}
-        <div>
-          <p>
-            <strong>Name: </strong> {userInfo?.name}
-          </p>
-          <p>
-            <strong>Email: </strong> {userInfo?.email}
-          </p>
-          <Button variant="primary" onClick={handleShow}>
-            Edit Profile
-          </Button>
-        </div>
+    <Row className="justify-content-md-center">
+      <Col md={6}>
+        <Card className="mt-5 mb-3">
+          <Card.Body>
+            <Card.Title>
+              {" "}
+              <strong>
+                {" "}
+                <h1> User Profile </h1>
+              </strong>
+            </Card.Title>
+            {message && <Alert variant="danger">{message}</Alert>}
+            <div className="profile-details">
+              <p>
+                <h4>
+                  <strong>Name: </strong> {userInfo?.name}
+                </h4>
+              </p>
+              <p>
+                <h4>
+                  <strong>Email: </strong> {userInfo?.email}
+                </h4>
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              onClick={handleShow}
+              className="edit-profile-btn"
+            >
+              <FaUserEdit /> Edit Profile
+            </Button>
+          </Card.Body>
+        </Card>
 
         <Modal show={showEditModal} onHide={handleClose}>
           <Modal.Header closeButton>
