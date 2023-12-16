@@ -48,12 +48,12 @@ const ProductListScreen = () => {
     <>
       <Row className="align-items-center">
         <Col>
-          <h1>Guitars</h1>
+          <h1>Groceries</h1>
         </Col>
         <Col className="text-end">
           <LinkContainer to={`/admin/product/add`}>
             <Button className="my-3 btn-bg">
-              <FaPlus /> Add Guitar
+              <FaPlus /> Add Grocery
             </Button>
           </LinkContainer>
         </Col>
@@ -106,7 +106,7 @@ const ProductListScreen = () => {
           <ListGroup>
             {data.products.map((product) => (
               <ListGroup.Item key={product._id}>
-                <strong>Guitar ID:</strong> {product._id}
+                <strong>Product ID:</strong> {product._id}
                 <br />
                 <strong> Name:</strong> {product.name}
                 <br />
