@@ -65,7 +65,7 @@ const AddProduct = () => {
         </Button>
       </Link>
       <FormContainer>
-        <h1>Add Guitar</h1>
+        <h1>Add Groceries</h1>
         {loadingcreate && <Loader />}
 
         <Form onSubmit={submitHandler}>
