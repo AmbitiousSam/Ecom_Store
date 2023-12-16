@@ -1,6 +1,9 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../models/orderModel.js';
 import { sendEmail } from '../config/email.js';
+import User from '../models/userModel.js';
+
+
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -34,8 +37,23 @@ const addOrderItems = asyncHandler(async (req, res) => {
       shippingPrice,
       totalPrice,
     });
-
     const createdOrder = await order.save();
+
+    const emailBody = {
+      from: process.env.EMAIL_USER, // Sender address
+      to: req.user.email, // User's email address
+      subject: 'Order Confirmation',
+      text: `Your order has been successfully created. Order ID: ${createdOrder._id}`,
+    }; 
+
+
+    try { 
+      await sendEmail(emailBody);
+      console.log('Email sent successfully');
+    } catch (error) {
+      console.error('Email could not be sent:', error.message); 
+    }
+
 
     res.status(201).json(createdOrder);
   }
@@ -67,8 +85,9 @@ const getOrderById = asyncHandler(async (req, res) => {
 });
 
 const updateOrderToPaid = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id);
-
+  const order = await Order.findById(req.params.id); 
+  const user = await User.findById(order.user.toString());
+  console.log("line 91");
   if (order) {
     order.isPaid = true;
     order.paidAt = Date.now();
@@ -78,20 +97,22 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
       update_time: req.body.update_time,
       email_address: req.body.payer.email_address,
     };
-
+    console.log("line 99");
     const updatedOrder = await order.save();
     const emailBody = {
       from: process.env.EMAIL_USER,
-      to: order.paymentResult.email_address,
+      to: user.email, 
       subject: 'Order Payment Confirmation',
-      text: `Your order has been successfully paid. Order ID: ${order._id}`,
+      text: `Your order has been successfully paid. Order ID: ${order}`,
     };
 
     try {
       await sendEmail(emailBody);
+      console.log('Email sent successfully');
       res.json(updatedOrder);
     } catch (error) {
       res.status(500).send({ message: error.message });
+      console.error('Email could not be sent:', error.message);
     }
   } else {
     res.status(404);
@@ -101,7 +122,10 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
 
 const updateOrderToDelivered = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
-
+  console.log(order.user.toString());
+  console.log("line 128");
+  const user = await User.findById(order.user.toString()); 
+  console.log("line 130");
   if (order) {
     order.isDelivered = true;
     order.deliveredAt = Date.now();
@@ -111,15 +135,17 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
     // Email content
     const emailBody = {
       from: process.env.EMAIL_USER,
-      to: order.user.email, // Assuming the order object has a user field with email
+      to: user.email, // Assuming the order object has a user field with email
       subject: 'Order Delivery Confirmation',
       text: `Your order has been delivered. Order ID: ${order._id}`,
     };
 
     try {
       await sendEmail(emailBody);
+      console.log('Email sent successfully');
       res.json(updatedOrder);
     } catch (error) {
+      console.error('Email could not be sent:', error.message);
       res.status(500).send({ message: error.message });
     }
   } else {
