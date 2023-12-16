@@ -66,9 +66,6 @@ const getOrderById = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Update order to paid
-// @route   GET /api/orders/:id/pay
-// @access  Private
 const updateOrderToPaid = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
@@ -89,17 +86,19 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
       subject: 'Order Payment Confirmation',
       text: `Your order has been successfully paid. Order ID: ${order._id}`,
     };
-    sendEmail(emailBody, res, 'Order payment confirmation email sent.');
-    res.json(updatedOrder);
+
+    try {
+      await sendEmail(emailBody);
+      res.json(updatedOrder);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
   } else {
     res.status(404);
     throw new Error('Order not found');
   }
 });
 
-// @desc    Update order to delivered
-// @route   GET /api/orders/:id/deliver
-// @access  Private/Admin
 const updateOrderToDelivered = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
@@ -111,21 +110,24 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
 
     // Email content
     const emailBody = {
-      from: process.env.EMAIL_USER, // Sender address
+      from: process.env.EMAIL_USER,
       to: order.user.email, // Assuming the order object has a user field with email
       subject: 'Order Delivery Confirmation',
       text: `Your order has been delivered. Order ID: ${order._id}`,
     };
 
-    // Send email notification about order delivery
-    sendEmail(emailBody, res, 'Order delivery confirmation email sent.');
-
-    res.json(updatedOrder);
+    try {
+      await sendEmail(emailBody);
+      res.json(updatedOrder);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
   } else {
     res.status(404);
     throw new Error('Order not found');
   }
 });
+
 // @desc    Get all orders
 // @route   GET /api/orders
 // @access  Private/Admin
