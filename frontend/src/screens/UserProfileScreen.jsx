@@ -3,28 +3,23 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Row, Col, Alert, Modal } from 'react-bootstrap';
 import { useGetUserDetailsQuery, useProfileMutation } from '../slices/usersApiSlice';
-import { toast } from 'react-toastify';
-import Loader from '../components/Loader';
-import Message from '../components/Message';
 
 const UserProfileScreen = () => {
-  // State for form fields and modal
-  const [show, setShow] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+  const [message, setMessage] = useState(null);
+
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
 
-  // Fetch the user's details
-  const { data: userDetails, isError, isLoading, error, refetch } = useGetUserDetailsQuery(userInfo?.id, {
+  const { data: userDetails, isError, isLoading, error } = useGetUserDetailsQuery(userInfo?.id, {
     skip: !userInfo?.id,
   });
 
-  // Mutation for updating user details
-  const [updateProfile, { isSuccess, isError: isUpdateError, error: updateError }] = useProfileMutation();
+  const [updateProfile, { isLoading: isUpdating }] = useProfileMutation();
 
   useEffect(() => {
     if (!userInfo) {
@@ -33,62 +28,103 @@ const UserProfileScreen = () => {
       setName(userDetails.name);
       setEmail(userDetails.email);
     }
-  }, [userInfo, userDetails, navigate]);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  }, [navigate, userInfo, userDetails]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-    try {
-      await updateProfile({ id: userInfo.id, name, email, password }).unwrap();
-      toast.success('Profile Updated Successfully!');
-      handleClose();
-      refetch();
-    } catch (err) {
-      toast.error(updateError?.data?.message || 'Could not update profile.');
+      setMessage('Passwords do not match');
+    } else {
+      try {
+        await updateProfile({ id: userInfo.id, name, email, password }).unwrap();
+        setMessage('Profile Updated Successfully!');
+        setShowEditModal(false); // Close modal on successful update
+      } catch (err) {
+        setMessage(err.data?.message || 'Could not update profile.');
+      }
     }
   };
 
-  // Check if loading or error states are present
-  if (isLoading) return <Loader />;
-  if (isError) return <Message variant="danger">{error?.data?.message || error.message}</Message>;
+  const handleClose = () => setShowEditModal(false);
+  const handleShow = () => setShowEditModal(true);
+
+  if (isLoading || isUpdating) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <Alert variant="danger">{error?.data?.message || 'Error fetching user details'}</Alert>;
+  }
 
   return (
-    <>
-      <Row>
-        <Col md={9}>
-          <h2>User Profile</h2>
+    <Row>
+      <Col md={9}>
+        <h2>User Profile</h2>
+        {message && <Alert variant="danger">{message}</Alert>}
+        <div>
           <p><strong>Name:</strong> {userDetails?.name}</p>
           <p><strong>Email:</strong> {userDetails?.email}</p>
           <Button variant="primary" onClick={handleShow}>Edit Profile</Button>
-        </Col>
-      </Row>
+        </div>
 
-      {/* Modal for editing user details */}
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Profile</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={submitHandler}>
-            {/* Form fields for name, email, password, and confirmPassword */}
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={submitHandler}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+        <Modal show={showEditModal} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Profile</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group controlId='name'>
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  type='text'
+                  placeholder='Enter name'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Form.Group>
+
+              <Form.Group controlId='email'>
+                <Form.Label>Email Address</Form.Label>
+                <Form.Control
+                  type='email'
+                  placeholder='Enter email'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
+
+              {/* <Form.Group controlId='password'>
+                <Form.Label>New Password</Form.Label>
+                <Form.Control
+                  type='password'
+                  placeholder='Enter new password'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Form.Group>
+
+              <Form.Group controlId='confirmPassword'>
+                <Form.Label>Confirm New Password</Form.Label>
+                <Form.Control
+                  type='password'
+                  placeholder='Confirm new password'
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </Form.Group> */}
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={submitHandler}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Col>
+    </Row>
   );
 };
 
