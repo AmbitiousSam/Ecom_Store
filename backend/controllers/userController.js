@@ -1,6 +1,7 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import generateToken from '../utils/generateToken.js';
 import User from '../models/userModel.js';
+import { sendEmail } from '../config/email.js';
 
 // @desc    Auth user & get token
 // @route   POST /api/users/auth
@@ -46,6 +47,16 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (user) {
     generateToken(res, user._id);
+
+    // Send thank-you email
+    const emailBody = {
+      from: process.env.EMAIL_USER, // Sender address
+      to: user.email, // Newly registered user's email
+      subject: 'Thank You for Registering',
+      text: `Hello ${user.name},\n\nThank you for registering with us!\n\nBest Regards,\nYour Team`,
+    };
+
+    sendEmail(emailBody, res, 'Thank you email sent.');
 
     res.status(201).json({
       _id: user._id,

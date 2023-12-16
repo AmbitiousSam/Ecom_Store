@@ -1,5 +1,6 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../models/orderModel.js';
+import { sendEmail } from '../config/email.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -82,7 +83,13 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
     };
 
     const updatedOrder = await order.save();
-
+    const emailBody = {
+      from: process.env.EMAIL_USER,
+      to: order.paymentResult.email_address,
+      subject: 'Order Payment Confirmation',
+      text: `Your order has been successfully paid. Order ID: ${order._id}`,
+    };
+    sendEmail(emailBody, res, 'Order payment confirmation email sent.');
     res.json(updatedOrder);
   } else {
     res.status(404);
@@ -102,13 +109,23 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
 
     const updatedOrder = await order.save();
 
+    // Email content
+    const emailBody = {
+      from: process.env.EMAIL_USER, // Sender address
+      to: order.user.email, // Assuming the order object has a user field with email
+      subject: 'Order Delivery Confirmation',
+      text: `Your order has been delivered. Order ID: ${order._id}`,
+    };
+
+    // Send email notification about order delivery
+    sendEmail(emailBody, res, 'Order delivery confirmation email sent.');
+
     res.json(updatedOrder);
   } else {
     res.status(404);
     throw new Error('Order not found');
   }
 });
-
 // @desc    Get all orders
 // @route   GET /api/orders
 // @access  Private/Admin
