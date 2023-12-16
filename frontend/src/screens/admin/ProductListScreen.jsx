@@ -35,7 +35,7 @@ const ProductListScreen = () => {
   //   useCreateProductMutation();
 
   // const createProductHandler = async () => {
-  //   if (window.confirm("Are you sure you want to add a new Guitar?")) {
+  //   if (window.confirm("Are you sure you want to add a new Grocries?")) {
   //     try {
   //       navigate("/admin/product/add");
   //     } catch (err) {
