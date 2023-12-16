@@ -1,5 +1,10 @@
 import { Navbar, Nav, Container, NavDropdown, Badge } from "react-bootstrap";
-import { FaShoppingCart, FaUser } from "react-icons/fa";
+import {
+  FaShoppingCart,
+  FaUser,
+  FaRegListAlt,
+  FaEnvelope,
+} from "react-icons/fa";
 import { LinkContainer } from "react-router-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +31,11 @@ const Header = () => {
     }
   };
 
+  const navLinkStyle = {
+    margin: "0 10px", // Adjust the horizontal margin as needed
+    padding: "0 5px", // Adjust the padding as needed
+  };
+
   return (
     <header>
       <Navbar
@@ -43,7 +53,7 @@ const Header = () => {
                 alt="ProShop"
                 className="bg-blend-lighten"
                 style={{
-                  maxWidth: "120px", // Sets the maximum width of the logo
+                  maxWidth: "100px", // Sets the maximum width of the logo
                   height: "auto", // Scales the height automatically to maintain the aspect ratio
                   display: "block", // Ensures the image does not inline with text
                   marginLeft: "auto", // Centers the logo by using with marginRight
@@ -55,6 +65,14 @@ const Header = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
+              {/* Contact Us Link with Icon */}
+              <LinkContainer to="/contact">
+                <Nav.Link style={navLinkStyle}>
+                  <FaEnvelope /> Contact Us
+                </Nav.Link>
+              </LinkContainer>
+
+              {/* Cart Icon */}
               <LinkContainer to="/cart">
                 <Nav.Link>
                   <FaShoppingCart /> Cart
@@ -65,34 +83,51 @@ const Header = () => {
                   )}
                 </Nav.Link>
               </LinkContainer>
+
+              {/* Orders Icon */}
+              {/* {userInfo && (
+                <LinkContainer to="/myorders">
+                  <Nav.Link>
+                    <FaRegListAlt /> My Orders
+                  </Nav.Link>
+                </LinkContainer>
+              )} */}
+
+              {/* Profile Dropdown */}
               {userInfo ? (
-                <>
-                  <LinkContainer to="/myorders">
-                    <Nav.Link>My Orders</Nav.Link>
+                <NavDropdown title={<FaUser />} id="user-menu">
+                  <LinkContainer to="/profile">
+                    <NavDropdown.Item>Profile</NavDropdown.Item>
                   </LinkContainer>
-                  <Nav.Link onClick={logoutHandler}> Logout</Nav.Link>
-                </>
+                  <LinkContainer to="/myorders">
+                    <NavDropdown.Item>My Orders</NavDropdown.Item>
+                  </LinkContainer>
+                  <NavDropdown.Item onClick={logoutHandler}>
+                    Logout
+                  </NavDropdown.Item>
+
+                  {/* Admin Links */}
+                  {userInfo.isAdmin && (
+                    <>
+                      <NavDropdown.Divider />
+                      <LinkContainer to="/admin/productlist">
+                        <NavDropdown.Item>Groceries</NavDropdown.Item>
+                      </LinkContainer>
+                      <LinkContainer to="/admin/orderlist">
+                        <NavDropdown.Item>Orders</NavDropdown.Item>
+                      </LinkContainer>
+                      <LinkContainer to="/admin/userlist">
+                        <NavDropdown.Item>Users</NavDropdown.Item>
+                      </LinkContainer>
+                    </>
+                  )}
+                </NavDropdown>
               ) : (
                 <LinkContainer to="/login">
                   <Nav.Link>
                     <FaUser /> Sign In
                   </Nav.Link>
                 </LinkContainer>
-              )}
-
-              {/* Admin Links */}
-              {userInfo && userInfo.isAdmin && (
-                <NavDropdown title="Dashboard" id="adminmenu">
-                  <LinkContainer to="/admin/productlist">
-                    <NavDropdown.Item>Groceries</NavDropdown.Item>
-                  </LinkContainer>
-                  <LinkContainer to="/admin/orderlist">
-                    <NavDropdown.Item>Orders</NavDropdown.Item>
-                  </LinkContainer>
-                  <LinkContainer to="/admin/userlist">
-                    <NavDropdown.Item>Users</NavDropdown.Item>
-                  </LinkContainer>
-                </NavDropdown>
               )}
             </Nav>
           </Navbar.Collapse>

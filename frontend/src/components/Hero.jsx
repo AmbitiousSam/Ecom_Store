@@ -14,7 +14,7 @@ const Hero = () => {
         <Row className="align-items-center">
           <Col md={6} className="my-3">
             <div className="hero-content text-center">
-              <h1>Welcome to Our Store.</h1>
+              <h1>Welcome to Fresh Grocery Story.</h1>
               <p>
                 Discover the latest trends and find the perfect products for
                 you.
