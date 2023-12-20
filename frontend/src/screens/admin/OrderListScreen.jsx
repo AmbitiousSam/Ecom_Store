@@ -1,5 +1,6 @@
 import { LinkContainer } from "react-router-bootstrap";
-import { Button, ListGroup, Badge } from "react-bootstrap";
+import { Row, Col, Button, ListGroup, Badge } from "react-bootstrap";
+import { FaEye } from "react-icons/fa";
 import Message from "../../components/Message";
 import Loader from "../../components/Loader";
 import { useGetOrdersQuery } from "../../slices/ordersApiSlice";
@@ -9,7 +10,18 @@ const OrderListScreen = () => {
 
   return (
     <>
-      <h2>All Orders</h2>
+      <Row className="align-items-center">
+        <Col>
+          <h1>All Orders</h1>
+        </Col>
+        <Col className="text-end">
+          <LinkContainer to={`/admin/order/audit`}>
+            <Button className="mb-3 btn-bg">
+              <FaEye /> View Audit
+            </Button>
+          </LinkContainer>
+        </Col>
+      </Row>{" "}
       {isLoading ? (
         <Loader />
       ) : error ? (

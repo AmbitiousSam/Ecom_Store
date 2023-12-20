@@ -52,7 +52,7 @@ const ProductListScreen = () => {
         </Col>
         <Col className="text-end">
           <LinkContainer to={`/admin/product/add`}>
-            <Button className="my-3 btn-bg">
+            <Button className="mb-3 btn-bg">
               <FaPlus /> Add Grocery
             </Button>
           </LinkContainer>

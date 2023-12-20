@@ -1,0 +1,36 @@
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .square-card {
+    flex: 0 1 calc(25% - 1em);
+    margin: 0.5em;
+    background: #f5f5f5; /* Light grey background, you can use a gradient or image */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px; /* Rounded corners */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .square-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .card-title {
+    font-size: 2rem; /* Larger font size */
+    font-weight: bold; /* Bold font */
+  }
+  
+  .card-text {
+    font-size: 1.25rem;
+  }
+  
+  .card-icon {
+    color: #4CAF50; /* Example color */
+    margin-right: 8px;
+    width: 30px; /* Larger icon */
+    height: 30px; /* Larger icon */
+  }
+  
